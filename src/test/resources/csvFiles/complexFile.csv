@@ -1,0 +1,6 @@
+"header,comma","header
+2 lines","header "" invered comma","header ""2 inverted commas"""
+"line
+2 lines","line end with invered comma""","""line start and end with inverted commas""",
+,test2,"test3 ""
+E1""",
