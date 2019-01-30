@@ -10,9 +10,14 @@ import org.eltn.projects.core.tests.base.BaseTest;
 import org.eltn.projects.core.tests.exceptions.AutomationTestException;
 import org.eltn.projects.core.utils.ListUtil;
 import org.eltn.projects.core.utils.StringUtil;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class CsvReaderApiTest extends BaseTest {
+	private enum GetRowEnum {
+		GET_ROW, GET_ROWS
+	}
+
 	public static final String DIR_PATH = "src/test/resources/csvFiles/";
 
 	public static final String EMPTY_FILE_PATH = DIR_PATH + "emptyFile.csv";
@@ -20,6 +25,11 @@ public class CsvReaderApiTest extends BaseTest {
 	public static final String DEFAULT_CSV_FILE_PATH = DIR_PATH + "defaultFile.csv";
 	public static final String COMPLEX_CSV_FILE_PATH = DIR_PATH + "complexFile.csv";
 	public static final String TAB_SEPARETOR_CSV_FILE_PATH = DIR_PATH + "tabSeparetor.csv";
+
+	public static final String HEADER_NOT_EXISTS = "Header Not Exists";
+	public static final String CELL_NOT_EXISTS = "Cell Not Exists";
+	public static final int OUT_OF_BOUND_ROW_INDEX = 99999;
+	public static final int NEGATIVE_ROW_INDEX = -1;
 
 	public static final String[] DEFAULT_CSV_HEADERS = { "header1", "header2", "header3" };
 
@@ -30,7 +40,7 @@ public class CsvReaderApiTest extends BaseTest {
 			"header \"2 inverted commas\"" };
 
 	public static final String[][] COMPLEX_CSV_BODY = {
-			{ "line\n2 lines", "line end with invered comma\"", "\"line start and end with inverted commas\"", "" },
+			{ "line\n2 lines", "line end with inverted comma\"", "\"line start and end with inverted commas\"", "\n\"" },
 			{ "", "test2", "test3 \"\nE1\"", "" } };
 
 	public static final String CELL_LOCATION_STR_TEMPLATE_BASE = "ell in row [" + StringUtil.REPLACE_STR + "], column ["
@@ -39,11 +49,19 @@ public class CsvReaderApiTest extends BaseTest {
 	public static final String CELL_LOCATION_START_WITH_CAPITAL_STR_TEMPLATE = "C" + CELL_LOCATION_STR_TEMPLATE_BASE;
 	public static final String CELL_LOCATION_STR_TEMPLATE = "c" + CELL_LOCATION_STR_TEMPLATE_BASE;
 
+	private CsvReaderApi defaultCsv = null;
+
+	@BeforeClass
+	public void beforeClass() throws AutomationTestException {
+		defaultCsv = readCsvFile(DEFAULT_CSV_FILE_PATH);
+	}
+
 	@Test
 	public void verify_empty_file_test() throws AutomationTestException {
 		CsvReaderApi csv = readCsvFile(EMPTY_FILE_PATH);
 
-		SoftAssert.assertTrue(csv.isCsvEmpty(), "CSV [" + EMPTY_FILE_PATH + "] isCsvEmpty() value is [false] and should be [true]");
+		SoftAssert.assertTrue(csv.isCsvEmpty(),
+				"CSV [" + EMPTY_FILE_PATH + "] isCsvEmpty() value is [false] and should be [true]");
 		SoftAssert.assertTrue(csv.getHeaderList().size() == 0,
 				"Empty CSV file [" + EMPTY_FILE_PATH + "] should not contains headers ["
 						+ ListUtil.getMultilineStringFromList(csv.getHeaderList()) + "]",
@@ -55,104 +73,96 @@ public class CsvReaderApiTest extends BaseTest {
 		SoftAssert.assertAll();
 	}
 
-	@Test(priority = 1)
+	@Test
 	public void verify_csv_file_contains_only_headers_test() throws AutomationTestException {
 		CsvReaderApi csv = readCsvFile(CSV_FILE_CONTAINS_ONLY_HEADERS_PATH);
 		verifyCsvHeaders(csv, DEFAULT_CSV_HEADERS);
 	}
 
-	@Test(priority = 2)
+	@Test
 	public void verify_cells_values_from_default_csv_file_test() throws AutomationTestException {
-		verifyCsv(DEFAULT_CSV_FILE_PATH, DEFAULT_CSV_HEADERS, DEFAULT_CSV_BODY);
+		verifyCsv(DEFAULT_CSV_FILE_PATH, DEFAULT_CSV_HEADERS, DEFAULT_CSV_BODY, GetRowEnum.GET_ROW);
 	}
 
-	@Test(priority = 3)
+	@Test
 	public void verify_cells_values_from_complex_csv_file_test() throws AutomationTestException {
-		verifyCsv(COMPLEX_CSV_FILE_PATH, COMPLEX_CSV_HEADERS, COMPLEX_CSV_BODY);
+		verifyCsv(COMPLEX_CSV_FILE_PATH, COMPLEX_CSV_HEADERS, COMPLEX_CSV_BODY, GetRowEnum.GET_ROWS);
 	}
 
-	@Test(priority = 4)
+	@Test
 	public void verify_cells_values_from_tab_separetor_csv_file_test() throws AutomationTestException {
-		verifyCsv(TAB_SEPARETOR_CSV_FILE_PATH, DEFAULT_CSV_HEADERS, DEFAULT_CSV_BODY, CellsSplitterEnum.TAB);
+		verifyCsv(TAB_SEPARETOR_CSV_FILE_PATH, DEFAULT_CSV_HEADERS, DEFAULT_CSV_BODY, CellsSplitterEnum.TAB,
+				GetRowEnum.GET_ROW);
 	}
 
-	@Test(priority = 5)
+	@Test
 	public void verify_getColumn_on_default_csv_test() throws AutomationTestException {
-		CsvReaderApi csv = readCsvFile(DEFAULT_CSV_FILE_PATH);
-
 		for (int i = 0; i < DEFAULT_CSV_HEADERS.length; i++) {
-			verifyCsvColumn(csv, DEFAULT_CSV_HEADERS[i], DEFAULT_CSV_BODY, i);
+			verifyCsvColumn(defaultCsv, DEFAULT_CSV_HEADERS[i], DEFAULT_CSV_BODY, i);
 		}
 
 		SoftAssert.assertAll();
 	}
 
-	@Test(priority = 6)
+	@Test
 	public void verify_getColumnIndex_on_default_csv_test() throws AutomationTestException {
-		CsvReaderApi csv = readCsvFile(DEFAULT_CSV_FILE_PATH);
-
 		for (int i = 0; i < DEFAULT_CSV_HEADERS.length; i++) {
-			int currentIndex = csv.getColumnIndex(DEFAULT_CSV_HEADERS[i]);
-			SoftAssert.assertTrue(currentIndex == i, "CSV [" + csv.getPath() + "] column [" + DEFAULT_CSV_HEADERS[i]
-					+ "] index is [" + currentIndex + "] and should be [" + i + "]");
+			int currentIndex = defaultCsv.getColumnIndex(DEFAULT_CSV_HEADERS[i]);
+			SoftAssert.assertTrue(currentIndex == i, "CSV [" + defaultCsv.getPath() + "] column ["
+					+ DEFAULT_CSV_HEADERS[i] + "] index is [" + currentIndex + "] and should be [" + i + "]");
 		}
 
 		SoftAssert.assertAll();
 	}
 
-	@Test(priority = 7)
+	@Test
 	public void verify_getHeaderList_on_default_csv_test() throws AutomationTestException {
-		CsvReaderApi csv = readCsvFile(DEFAULT_CSV_FILE_PATH);
-
-		List<String> currentHeaderList = csv.getHeaderList();
+		List<String> currentHeaderList = defaultCsv.getHeaderList();
 
 		SoftAssert.assertNotNullNow(currentHeaderList,
-				"Header list for CSV [" + csv.getPath() + "] should not be null");
+				"Header list for CSV [" + defaultCsv.getPath() + "] should not be null");
 
 		if (SoftAssert.assertTrue(DEFAULT_CSV_HEADERS.length == currentHeaderList.size(),
-				"Header list size of CSV [" + csv.getPath() + "] is [" + currentHeaderList.size() + "] and should be ["
-						+ DEFAULT_CSV_HEADERS.length + "]",
-				"Verify that header list size of CSV [" + csv.getPath() + "] should be [" + DEFAULT_CSV_HEADERS.length
-						+ "]")) {
+				"Header list size of CSV [" + defaultCsv.getPath() + "] is [" + currentHeaderList.size()
+						+ "] and should be [" + DEFAULT_CSV_HEADERS.length + "]",
+				"Verify that header list size of CSV [" + defaultCsv.getPath() + "] should be ["
+						+ DEFAULT_CSV_HEADERS.length + "]")) {
 			for (int i = 0; i < DEFAULT_CSV_HEADERS.length; i++) {
 				String currentHeader = currentHeaderList.get(i);
 				String expectedHeader = DEFAULT_CSV_HEADERS[i];
 				int columnNumber = i + 1;
 				SoftAssert.assertTrue(expectedHeader.equals(currentHeader),
-						"Header in CSV [" + csv.getPath() + "] in column number [" + columnNumber + "] is ["
+						"Header in CSV [" + defaultCsv.getPath() + "] in column number [" + columnNumber + "] is ["
 								+ currentHeader + "] and should be [" + expectedHeader + "]",
-						"Verify that header in CSV [" + csv.getPath() + "] in column number [" + columnNumber + "] is ["
-								+ expectedHeader + "]");
+						"Verify that header in CSV [" + defaultCsv.getPath() + "] in column number [" + columnNumber
+								+ "] is [" + expectedHeader + "]");
 			}
 		}
 
 		SoftAssert.assertAll();
 	}
 
-	@Test(priority = 8)
+	@Test
 	public void verify_getRow_on_default_csv_test() throws AutomationTestException {
-		CsvReaderApi csv = readCsvFile(DEFAULT_CSV_FILE_PATH);
-
 		for (int i = 0; i < DEFAULT_CSV_BODY.length; i++) {
-			verifyCsvRow(csv, DEFAULT_CSV_BODY, i);
+			verifyCsvRow(defaultCsv, DEFAULT_CSV_BODY, i);
 		}
 
 		SoftAssert.assertAll();
 	}
 
-	@Test(priority = 9)
+	@Test
 	public void verify_getRowIndex_on_default_csv_test() throws AutomationTestException {
-		CsvReaderApi csv = readCsvFile(DEFAULT_CSV_FILE_PATH);
-
 		for (int i = 0; i < DEFAULT_CSV_BODY.length; i++) {
 			for (int j = 0; j < DEFAULT_CSV_BODY[i].length; j++) {
 				String headerName = DEFAULT_CSV_HEADERS[j];
 				String cell = DEFAULT_CSV_BODY[i][j];
-				int currentRowIndex = csv.getRowIndex(headerName, cell);
+				int currentRowIndex = defaultCsv.getRowIndex(headerName, cell);
 				SoftAssert.assertTrue(currentRowIndex == i,
-						"Row index in CSV [" + csv.getPath() + "] for header [" + headerName + "] and cell value ["
-								+ cell + "] is [" + currentRowIndex + "] and should be [" + i + "]",
-						"Verify that row index in CSV [" + csv.getPath() + "] for header [" + headerName
+						"Row index in CSV [" + defaultCsv.getPath() + "] for header [" + headerName
+								+ "] and cell value [" + cell + "] is [" + currentRowIndex + "] and should be [" + i
+								+ "]",
+						"Verify that row index in CSV [" + defaultCsv.getPath() + "] for header [" + headerName
 								+ "] and cell value [" + cell + "] is [" + i + "]");
 			}
 		}
@@ -160,35 +170,180 @@ public class CsvReaderApiTest extends BaseTest {
 		SoftAssert.assertAll();
 	}
 
-	@Test(priority = 10)
+	@Test
 	public void verify_getRowsAmmount_on_default_csv_test() throws AutomationTestException {
-		CsvReaderApi csv = readCsvFile(DEFAULT_CSV_FILE_PATH);
-		SoftAssert.assertTrueNow(csv.getRowsAmount() == DEFAULT_CSV_BODY.length,
-				"CSV [" + csv.getPath() + "] rows amount is [" + csv.getRowsAmount() + "] and should be ["
+		SoftAssert.assertTrueNow(defaultCsv.getRowsAmount() == DEFAULT_CSV_BODY.length,
+				"CSV [" + defaultCsv.getPath() + "] rows amount is [" + defaultCsv.getRowsAmount() + "] and should be ["
 						+ DEFAULT_CSV_BODY.length + "]",
-				"Verify that CSV [" + csv.getPath() + "] rows amount is [" + DEFAULT_CSV_BODY.length + "]");
+				"Verify that CSV [" + defaultCsv.getPath() + "] rows amount is [" + DEFAULT_CSV_BODY.length + "]");
 	}
 
-	@Test(priority = 11)
+	@Test
 	public void verify_getFieldValue_on_default_csv_test() throws AutomationTestException {
-		CsvReaderApi csv = readCsvFile(DEFAULT_CSV_FILE_PATH);
-
 		for (int i = 0; i < DEFAULT_CSV_BODY.length; i++) {
 			for (int j = 0; j < DEFAULT_CSV_BODY[i].length; j++) {
-				String currentCell = csv.getFieldValue(DEFAULT_CSV_HEADERS[j], i);
+				String currentCell;
+				try {
+					currentCell = defaultCsv.getFieldValue(DEFAULT_CSV_HEADERS[j], i);
+				} catch (Exception e) {
+					throw new AutomationTestException(e);
+				}
 				String expectedCell = DEFAULT_CSV_BODY[i][j];
 
-				SoftAssert.assertNotNullNow(currentCell, "CSV [" + csv.getPath() + "] getFieldValue value of header ["
-						+ DEFAULT_CSV_HEADERS[j] + "] and row index [" + i + "] should not be null");
+				SoftAssert.assertNotNullNow(currentCell,
+						"CSV [" + defaultCsv.getPath() + "] getFieldValue value of header [" + DEFAULT_CSV_HEADERS[j]
+								+ "] and row index [" + i + "] should not be null");
 
 				SoftAssert.assertTrueNow(expectedCell.equals(currentCell),
-						"CSV [" + csv.getPath() + "] getFieldValue value of header [" + DEFAULT_CSV_HEADERS[j]
+						"CSV [" + defaultCsv.getPath() + "] getFieldValue value of header [" + DEFAULT_CSV_HEADERS[j]
 								+ "] and row index [" + i + "] is [" + currentCell + "] and should be [" + expectedCell
 								+ "]",
-						"Verify that CSV [" + csv.getPath() + "] getFieldValue value of header ["
+						"Verify that CSV [" + defaultCsv.getPath() + "] getFieldValue value of header ["
 								+ DEFAULT_CSV_HEADERS[j] + "] and row index [" + i + "] is [" + expectedCell + "]");
 			}
 		}
+	}
+
+	@Test
+	public void csv_file_not_found_negative_test() {
+		final String path = "/dir/fileNotFound.csv";
+
+		boolean isException = false;
+
+		try {
+			readCsvFile(path);
+		} catch (AutomationTestException e) {
+			isException = true;
+		}
+
+		SoftAssert.assertTrueNow(isException,
+				"Exception should appear when trying to parse file that not exists in path [" + path + "]",
+				"Verify that exception appear when trying to parse csv file that not exists in path [" + path + "]");
+	}
+
+	@Test
+	public void getColumnIndex_with_header_not_exists_negative_test() throws AutomationTestException {
+		int index = defaultCsv.getColumnIndex(HEADER_NOT_EXISTS);
+
+		SoftAssert.assertTrueNow(index == -1,
+				"Index for CSV [" + defaultCsv.getPath() + " with header that not exists as a parameter ["
+						+ HEADER_NOT_EXISTS + "] value is [" + index + "] and should be [-1]",
+				"Verify that index for CSV [" + defaultCsv.getPath() + " with header that not exists as a parameter ["
+						+ HEADER_NOT_EXISTS + "] value is [-1]");
+	}
+
+	@Test
+	public void getColumn_with_header_not_exists_negative_test() throws AutomationTestException {
+		CsvReaderApi csv = readCsvFile(DEFAULT_CSV_FILE_PATH);
+		List<String> columnList = csv.getColumn(HEADER_NOT_EXISTS);
+		SoftAssert.assertTrueNow(columnList == null,
+				"getColumn result on CSV [" + defaultCsv.getPath() + "] with header that not exists ["
+						+ HEADER_NOT_EXISTS + "] should be null",
+				"Verify that getColumn result on CSV [" + defaultCsv.getPath() + "] with header that not exists ["
+						+ HEADER_NOT_EXISTS + "] is null");
+	}
+
+	@Test
+	public void getFieldValue_with_out_of_bound_row_index_negative_test() throws AutomationTestException {
+		boolean isException = false;
+		try {
+			defaultCsv.getFieldValue(DEFAULT_CSV_HEADERS[0], OUT_OF_BOUND_ROW_INDEX);
+		} catch (IndexOutOfBoundsException e) {
+			isException = true;
+		} catch (InvalidValueException e) {
+			throw new AutomationTestException(e);
+		}
+
+		SoftAssert.assertTrueNow(isException,
+				"getFieldValue on CSV [" + defaultCsv.getPath()
+						+ "] with row index out of bound value should throw IndexOutOfBoundsException",
+				"Verify that getFieldValue on CSV [" + defaultCsv.getPath()
+						+ "] with row index out of bound value throw IndexOutOfBoundsException");
+	}
+
+	@Test
+	public void getFieldValue_with_negative_index_negative_test() throws AutomationTestException {
+		boolean isException = false;
+		try {
+			defaultCsv.getFieldValue(DEFAULT_CSV_HEADERS[0], NEGATIVE_ROW_INDEX);
+		} catch (IndexOutOfBoundsException e) {
+			throw new AutomationTestException(e);
+		} catch (InvalidValueException e) {
+			isException = true;
+		}
+
+		SoftAssert.assertTrueNow(isException,
+				"getFieldValue on CSV [" + defaultCsv.getPath()
+						+ "] with negative row index should throw InvalidValueException",
+				"Verify that getFieldValue on CSV [" + defaultCsv.getPath()
+						+ "] with negative row index throw InvalidValueException");
+	}
+
+	@Test
+	public void getFieldValue_with_header_not_exists_negative_test() throws InvalidValueException {
+		String cell = defaultCsv.getFieldValue(HEADER_NOT_EXISTS, 0);
+
+		SoftAssert.assertTrueNow(cell == null,
+				"getFieldValue on CSV [" + defaultCsv.getPath()
+						+ "] with header that not exists should be null but is [" + cell + "]",
+				"Verify that getFieldValue on CSV [" + defaultCsv.getPath() + "] with header that not exists in null");
+	}
+
+	@Test
+	public void getRow_with_negative_row_index_negative_test() throws AutomationTestException {
+		boolean isException = false;
+
+		try {
+			defaultCsv.getRow(NEGATIVE_ROW_INDEX);
+		} catch (InvalidValueException e) {
+			isException = true;
+		} catch (IndexOutOfBoundsException e) {
+			throw new AutomationTestException(e);
+		}
+
+		SoftAssert.assertTrue(isException,
+				"getRow on CSV [" + defaultCsv.getPath()
+						+ "] with negative row index should throw InvalidValueException",
+				"Verify that getRow on CSV [" + defaultCsv.getPath()
+						+ "] with negative row index throw InvalidValueException");
+	}
+
+	@Test
+	public void getRow_with_out_of_bounds_row_index_negative_test() throws AutomationTestException {
+		boolean isException = false;
+
+		try {
+			defaultCsv.getRow(OUT_OF_BOUND_ROW_INDEX);
+		} catch (InvalidValueException e) {
+			throw new AutomationTestException(e);
+		} catch (IndexOutOfBoundsException e) {
+			isException = true;
+		}
+
+		SoftAssert.assertTrue(isException,
+				"getRow on CSV [" + defaultCsv.getPath()
+						+ "] with out of bounds row index should throw IndexOutOfBoundsException",
+				"Verify that getRow on CSV [" + defaultCsv.getPath()
+						+ "] with out of bounds row index throw IndexOutOfBoundsException");
+	}
+
+	@Test
+	public void getRowIndex_with_header_not_exists_negative_test() throws AutomationTestException {
+		int index = defaultCsv.getRowIndex(HEADER_NOT_EXISTS, DEFAULT_CSV_BODY[0][0]);
+		SoftAssert.assertTrueNow(index == -1,
+				"Row index in CSV [" + defaultCsv.getPath() + "] for header that not exists is [" + index
+						+ "] and should be [-1]",
+				"Verify that row index in CSV [" + defaultCsv.getPath() + "] for header that not exists is [-1]");
+	}
+
+	@Test
+	public void getRowIndex_with_cell_not_exists_negative_test() throws AutomationTestException {
+		int index = defaultCsv.getRowIndex(DEFAULT_CSV_HEADERS[0], CELL_NOT_EXISTS);
+		SoftAssert.assertTrueNow(index == -1,
+				"Row index in CSV [" + defaultCsv.getPath() + "] for header [" + DEFAULT_CSV_HEADERS[0]
+						+ "] and cell that not exists [" + CELL_NOT_EXISTS + "] is [" + index + "] and should be [-1]",
+				"Verify that row index in CSV [" + defaultCsv.getPath() + "] for header [" + DEFAULT_CSV_HEADERS[0]
+						+ "] and cell that not exists [" + CELL_NOT_EXISTS + "] is [-1]");
 	}
 
 	private void verifyCsvRow(CsvReaderApi csv, String[][] expectedCsvBody, int rowIndex)
@@ -239,31 +394,32 @@ public class CsvReaderApiTest extends BaseTest {
 	}
 
 	private void verifyCsv(String csvPath, String[] expectedCsvHeaders, String[][] expectedCsvBody,
-			CellsSplitterEnum cellSplitter) throws AutomationTestException {
+			CellsSplitterEnum cellSplitter, GetRowEnum getRowEnum) throws AutomationTestException {
 		try {
 			CsvReaderApi csv = readCsvFile(csvPath, cellSplitter);
 			verifyCsvHeaders(csv, expectedCsvHeaders);
-			verifyCsvBody(csv, expectedCsvBody);
+			verifyCsvBody(csv, expectedCsvBody, getRowEnum);
 		} finally {
 			SoftAssert.assertAll();
 		}
 	}
 
-	private void verifyCsv(String csvPath, String[] expectedCsvHeaders, String[][] expectedCsvBody)
-			throws AutomationTestException {
+	private void verifyCsv(String csvPath, String[] expectedCsvHeaders, String[][] expectedCsvBody,
+			GetRowEnum getRowEnum) throws AutomationTestException {
 		try {
 			CsvReaderApi csv = readCsvFile(csvPath);
 			verifyCsvHeaders(csv, expectedCsvHeaders);
-			verifyCsvBody(csv, expectedCsvBody);
+			verifyCsvBody(csv, expectedCsvBody, getRowEnum);
 		} finally {
 			SoftAssert.assertAll();
 		}
 	}
 
-	private void verifyCsvBody(CsvReaderApi csv, String[][] expectedBody) throws AutomationTestException {
+	private void verifyCsvBody(CsvReaderApi csv, String[][] expectedBody, GetRowEnum getRowEnum)
+			throws AutomationTestException {
 		try {
 			for (int i = 0; i < expectedBody.length; i++) {
-				List<String> currentRow = csv.getRow(i);
+				List<String> currentRow = getRow(i, getRowEnum, csv);
 
 				if (SoftAssert.assertTrue(expectedBody[i].length == currentRow.size(),
 						"Row number [" + (i + 1) + "] size in csv file [" + csv.getPath() + "] is [" + currentRow.size()
@@ -274,6 +430,15 @@ public class CsvReaderApiTest extends BaseTest {
 		} catch (Exception e) {
 			throw new AutomationTestException(e);
 		}
+	}
+
+	private List<String> getRow(int index, GetRowEnum getRowEnum, CsvReaderApi csv)
+			throws InvalidValueException, IndexOutOfBoundsException {
+		if (getRowEnum == GetRowEnum.GET_ROW) {
+			return csv.getRow(index);
+		}
+
+		return csv.getRows().get(index);
 	}
 
 	private void verifyCsvLine(List<String> currentRow, List<String> expectedRow, int rowIndex, String csvPath)

@@ -13,6 +13,12 @@ import java.util.List;
 import org.eltn.projects.core.expections.InvalidValueException;
 import org.eltn.projects.core.utils.StringUtil;
 
+/*************************************************
+ * Parse CSV file.
+ * 
+ * @author Eyal Tuzon.
+ *
+ */
 public class CsvReaderApi {
 	public enum CellsSplitterEnum {
 		TAB('\t'), SPACE(' '), COMMA(',');
@@ -40,14 +46,34 @@ public class CsvReaderApi {
 
 	private final char cellsSplitter;
 
+	/*********************************
+	 * Constructor.
+	 * 
+	 * @param path CSV file path
+	 * @throws IOException In case fail read CSV file
+	 */
 	public CsvReaderApi(String path) throws IOException {
 		this(path, CELLS_DEFAULT_SPLITTER);
 	}
 
+	/********************************
+	 * Constructor.
+	 * 
+	 * @param path CSV file path.
+	 * @param cellsSplitter CSV cells splitter enum.
+	 * @throws IOException In case fail read CSV file.
+	 */
 	public CsvReaderApi(String path, CellsSplitterEnum cellsSplitter) throws IOException {
 		this(path, cellsSplitter.getName());
 	}
 
+	/*******************************
+	 * Constructor.
+	 * 
+	 * @param path CSV file path.
+	 * @param cellsSplitter CSV cells splitter char.
+	 * @throws IOException In case fail read CSV file.
+	 */
 	public CsvReaderApi(String path, char cellsSplitter) throws IOException {
 		this.path = path;
 		this.cellsSplitter = cellsSplitter;
@@ -56,6 +82,12 @@ public class CsvReaderApi {
 		setHeaderList();
 	}
 
+	/******************************
+	 * Get CSV rows amount.
+	 * Not include headers line.
+	 * 
+	 * @return CSV rows amount.
+	 */
 	public int getRowsAmount() {
 		if (csvRows == null) {
 			return -1;
@@ -64,16 +96,34 @@ public class CsvReaderApi {
 		return csvRows.size();
 	}
 
+	/******************************
+	 * Return true if CSV not contain rows,
+	 * Ignore headers line if exists.
+	 * 
+	 * @return
+	 */
 	public boolean isCsvEmpty() {
 		return getRowsAmount() < 1;
 	}
 
+	/******************************
+	 * Get header list.
+	 * 
+	 * @return String list of CSV headers.
+	 */
 	public List<String> getHeaderList() {
 		return headerList;
 	}
 
+	/******************************
+	 * Get column index that it's header is 'headerName'.
+	 * First index is 0.
+	 * 
+	 * @param headerName Header name.
+	 * @return Column index. Return -1 in case header not exists.
+	 */
 	public int getColumnIndex(String headerName) {
-		for (int i=0; i < headerList.size(); i++) {
+		for (int i = 0; i < headerList.size(); i++) {
 			if (headerList.get(i).equals(headerName)) {
 				return i;
 			}
@@ -82,20 +132,29 @@ public class CsvReaderApi {
 		return -1;
 	}
 
-	public int getRowIndex(String headerName, String value) {
+	/******************************
+	 * Get row index thats it's column header is 'headerName',
+	 * and cell in that column is 'value'.
+	 * 
+	 * @param headerName Header name.
+	 * @param value Field value.
+	 * @return Row index. Return -1 in case column or cell not exist.
+	 * @throws IndexOutOfBoundsException. In case column index exceed row.
+	 */
+	public int getRowIndex(String headerName, String value) throws IndexOutOfBoundsException {
 		int columnIndex = getColumnIndex(headerName);
 
 		if (columnIndex == -1) {
 			return -1;
 		}
 
-		for (int i=0; i < csvRows.size(); i++) {
+		for (int i = 0; i < csvRows.size(); i++) {
 			List<String> row = csvRows.get(i);
-			
+
 			if (row.size() <= columnIndex) {
-				return -1;
+				throw new IndexOutOfBoundsException("Column index [" + columnIndex + "] in CSV file [" + getPath() + "] exceed of row size [" + row.size() + "]");
 			}
-			
+
 			if (row.get(columnIndex).equals(value)) {
 				return i;
 			}
@@ -104,13 +163,19 @@ public class CsvReaderApi {
 		return -1;
 	}
 
+	/******************************
+	 * Get column cells.
+	 * 	
+	 * @param headerName Header name.
+	 * @return List of column cells. Return null in case column not exists.
+	 */
 	public List<String> getColumn(String headerName) {
 		List<String> columnValues = new ArrayList<String>();
 
 		int index = getColumnIndex(headerName);
 
 		if (index == -1) {
-			return columnValues;
+			return null;
 		}
 
 		for (List<String> row : csvRows) {
@@ -120,37 +185,81 @@ public class CsvReaderApi {
 		return columnValues;
 	}
 
-	public String getFieldValue(String headerName, int rowIndex) {
+	/******************************
+	 * Get cell value.
+	 * 	
+	 * @param headerName Header name.
+	 * @param rowIndex Row index.
+	 * @return Field value in column that it's header is 'headerName', and the cell exists in 'rowIndex'.
+	 *         Return null in case 'headerName' column not exists.
+	 * @throws InvalidValueException Row index is negative number.
+	 * @throws IndexOutOfBoundsException Row index exceed of column size.
+	 */
+	public String getFieldValue(String headerName, int rowIndex) throws InvalidValueException, IndexOutOfBoundsException {
+		if (rowIndex < 0) {
+			throw new InvalidValueException("Index value [" + rowIndex + "] should not be negative");
+		}
+
 		List<String> columnFields = getColumn(headerName);
 
+		if (columnFields == null) {
+			return null;
+		}
+
 		if (rowIndex >= columnFields.size()) {
-			return "";
+			throw new IndexOutOfBoundsException("Index [" + rowIndex + "] is out of bound. CSV [" + getPath() + "] cells amount for header ["
+					+ columnFields + "] is [" + columnFields.size() + "]");
 		}
 
 		return columnFields.get(rowIndex);
 	}
 
+	/******************************
+	 * Get rows not include headers row.
+	 * 
+	 * @return CSV cells not include headers line.
+	 */
 	public List<List<String>> getRows() {
 		return csvRows;
 	}
 
-	public List<String> getRow(int index) throws InvalidValueException {
+	/******************************
+	 * Get row in index.
+	 * Index 0 start after headers row.
+	 * 
+	 * @param index Row index not include headers row.
+	 * @return Row cells.
+	 * @throws InvalidValueException Index is negative number.
+	 * @throws IndexOutOfBoundsException Index exceed of rows amount.
+	 */
+	public List<String> getRow(int index) throws InvalidValueException, IndexOutOfBoundsException {
 		if (index < 0) {
-			throw new InvalidValueException("Index value [" + index + "] should not be less than 0");
+			throw new InvalidValueException("Index value [" + index + "] should not be negative");
 		}
 
-		if (index < getRowsAmount()) {
-			return csvRows.get(index);
+		if (index >= getRowsAmount()) {
+			throw new IndexOutOfBoundsException(
+					"Index [" + index + "] is out of bound. CSV [" + getPath() + "] rows amount [" + getRowsAmount() + "]");
 		}
-
-		throw new InvalidValueException(
-				"Index [" + index + "] is out of bound. CSV rows amount [" + getRowsAmount() + "]");
+		
+		return csvRows.get(index);
 	}
 
+	/******************************
+	 * Get CSV file path.
+	 * 	
+	 * @return CSV file path.
+	 */
 	public String getPath() {
 		return path;
 	}
 
+	/*******************************
+	 * Parse CSV file into List<List<String>>.
+	 * 
+	 * @param path CSV file path
+	 * @throws IOException In case fail read CSV file
+	 */
 	private void parseCsv(String path) throws IOException {
 		BufferedReader buff = null;
 
@@ -176,7 +285,10 @@ public class CsvReaderApi {
 			throw new FileNotFoundException("CSV file [" + path + "] was not found");
 		} finally {
 			if (buff != null) {
-				buff.close();
+				try {
+					buff.close();
+				} catch (IOException e) {
+				}
 			}
 		}
 	}
@@ -184,7 +296,7 @@ public class CsvReaderApi {
 	private void parsePreFormattedRow(String row) {
 		List<String> preFormattedCellList = StringUtil.split(row, cellsSplitter);
 
-		for (int i=0; i < preFormattedCellList.size(); i++) {
+		for (int i = 0; i < preFormattedCellList.size(); i++) {
 			String preFormattedCell = preFormattedCellList.get(i);
 
 			if (isCellInInvertedComma) {
@@ -230,32 +342,30 @@ public class CsvReaderApi {
 		boolean isOddInvertedCommas = isOddInvertedCommasFromBegin(preFormattedCell);
 
 		if (isOddInvertedCommas) {
-			if (isOddInvertedCommasFromEnd(preFormattedCell)) {
-				String str = removeCsvInvertedCommasInCell(preFormattedCell);
-				cellsInLine.add(str);
+			if ((isOddInvertedCommasFromEnd(preFormattedCell)) && (preFormattedCell.length() > 1)) {
+				cellsInLine.add(removeCsvInvertedCommasInCell(preFormattedCell));
 			} else {
 				isCellInInvertedComma = true;
 				cell = preFormattedCell;
 			}
 		} else {
-			String str = removeCsvInvertedCommasInCell(preFormattedCell);
-			cellsInLine.add(str);
+			cellsInLine.add(removeCsvInvertedCommasInCell(preFormattedCell));
 		}
 	}
 
-	private boolean isOddInvertedCommasFromBegin(String field) {
-		if (field == null) {
+	private boolean isOddInvertedCommasFromBegin(String cell) {
+		if (cell == null) {
 			return false;
 		}
 
-		if (field.startsWith("\"") == false) {
+		if (cell.startsWith("\"") == false) {
 			return false;
 		}
 
 		int count = 0;
 
-		for (int i=0; i < field.length(); i++) {
-			char c = field.charAt(i);
+		for (int i = 0; i < cell.length(); i++) {
+			char c = cell.charAt(i);
 			if (c == '"') {
 				count++;
 			} else {
@@ -283,7 +393,7 @@ public class CsvReaderApi {
 
 		int count = 0;
 
-		for (int i=raw.length() - 1; i >= 0; i--) {
+		for (int i = raw.length() - 1; i >= 0; i--) {
 			char c = raw.charAt(i);
 			if (c == '"') {
 				count++;
@@ -296,7 +406,7 @@ public class CsvReaderApi {
 	}
 
 	/********************************************************************
-	 * Remove the additional inverted commas that * the csv add to the fields
+	 * Remove the additional inverted commas that * the csv add to the cells
 	 * 
 	 * @param cell
 	 *            *
