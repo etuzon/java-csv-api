@@ -3,13 +3,13 @@
   <parent>
     <artifactId>base.pom</artifactId>
     <groupId>org.eltn.java</groupId>
-    <version>1.0.4-base</version>
+    <version>1.0.5-base</version>
     <relativePath>../pom.xml/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>csv.api</artifactId>
   <name>CSV API</name>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.9.1-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>org.testng</groupId>
@@ -32,6 +32,12 @@
       <artifactId>tests.core</artifactId>
       <version>1.0.3</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-lang3</artifactId>
+          <groupId>org.apache.commons</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <properties>

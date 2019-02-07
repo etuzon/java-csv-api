@@ -3,14 +3,14 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>csv.api</artifactId>
-	<version>0.9.0</version>
+	<version>0.9.1</version>
 
 	<name>CSV API</name>
 
 	<parent>
 		<groupId>org.eltn.java</groupId>
 		<artifactId>base.pom</artifactId>
-		<version>1.0.4-base</version>
+		<version>1.0.5-base</version>
 	</parent>
 
 	<properties>
@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>org.eltn.java</groupId>
 			<artifactId>projects.core</artifactId>
-			<version>1.0.3</version>
+			<version>1.0.5</version>
 		</dependency>
 	</dependencies>
 </project>
