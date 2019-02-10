@@ -10,57 +10,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eltn.java.csv.enums.CellsSplitterEnum;
 import org.eltn.projects.core.expections.InvalidValueException;
 import org.eltn.projects.core.utils.StringUtil;
 
 /*************************************************
  * Parse CSV file.
  *
- * @author Eyal Tuzon.
+ * @author Eyal Tuzon
  * 
  */
-public class CsvReaderApi {
-    /*********************************
-     * Cells splitter enum.
-     *
-     * @author Eyal Tuzon.
-     * 
-     */
-    public static enum CellsSplitterEnum {
-        TAB('\t'), SPACE(' '), COMMA(',');
-
-        private final char chr;
-
-        /*********************************
-         * Constructor.
-         *
-         * @param value Enum char.
-         */
-        private CellsSplitterEnum(char value) {
-            chr = value;
-        }
-
-        /*********************************
-         * Get cells splitter char.
-         *
-         * @return cells splitter char.
-         */
-        public char getChar() {
-            return chr;
-        }
-    }
-
-    public static final char CELLS_DEFAULT_SPLITTER = ',';
-
-    private final String path;
-    private List<String> headerList = new ArrayList<String>();
-    private final List<List<String>> csvRows = new ArrayList<List<String>>();;
-
+public class CsvReaderApi extends CsvApiBase {
+    
     private String cell = "";
     private List<String> cellsInLine = new ArrayList<String>();
     private boolean isCellInInvertedComma = false;
-
-    private final char cellsSplitter;
 
     /*********************************
      * Constructor.
@@ -91,8 +55,7 @@ public class CsvReaderApi {
      * @throws IOException In case fail read CSV file.
      */
     public CsvReaderApi(String path, char cellsSplitter) throws IOException {
-        this.path = path;
-        this.cellsSplitter = cellsSplitter;
+        super(path, cellsSplitter);
 
         parseCsv(path);
         setHeaderList();
