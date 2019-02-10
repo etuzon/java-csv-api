@@ -18,6 +18,7 @@ public class CsvReaderApiTest extends CsvApiTestBase implements TestParameters {
 	public static final String DEFAULT_CSV_FILE_PATH = DIR_PATH + "defaultFile.csv";
 	public static final String COMPLEX_CSV_FILE_PATH = DIR_PATH + "complexFile.csv";
 	public static final String TAB_SEPARETOR_CSV_FILE_PATH = DIR_PATH + "tabSeparetor.csv";
+    public static final String DEFAULT_CSV_FILE_WITHOUT_HEADERS_PATH = DIR_PATH + "defaultFileWithoutHeaders.csv";
 
 	public static final String HEADER_NOT_EXISTS = "Header Not Exists";
 	public static final String CELL_NOT_EXISTS = "Cell Not Exists";
@@ -321,6 +322,11 @@ public class CsvReaderApiTest extends CsvApiTestBase implements TestParameters {
 						+ "] and cell that not exists [" + CELL_NOT_EXISTS + "] is [-1]");
 	}
 
+	@Test
+	public void verify_default_csv_without_headers_test() throws AutomationTestException {
+        verifyCsvThatNotContainHeaders(DEFAULT_CSV_FILE_WITHOUT_HEADERS_PATH, DEFAULT_CSV_BODY, GetRowEnum.GET_ROWS);
+	}
+	
 	private void verifyCsvRow(CsvReaderApi csv, String[][] expectedCsvBody, int rowIndex)
 			throws AutomationTestException {
 		try {

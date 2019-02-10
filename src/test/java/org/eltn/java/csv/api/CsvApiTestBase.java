@@ -35,6 +35,16 @@ public abstract class CsvApiTestBase extends BaseTest {
         }
     }
    
+    protected void verifyCsvThatNotContainHeaders(String csvPath, String[][] expectedCsvBody,
+            GetRowEnum getRowEnum) throws AutomationTestException {
+        try {
+            CsvReaderApi csv = readCsvFileNotContainHeaders(csvPath);
+            verifyCsvBody(csv, expectedCsvBody, getRowEnum);
+        } finally {
+            SoftAssert.assertAll();
+        }
+    }
+    
     protected void verifyCsv(String csvPath, String[] expectedCsvHeaders, String[][] expectedCsvBody,
             GetRowEnum getRowEnum) throws AutomationTestException {
         try {
@@ -78,6 +88,18 @@ public abstract class CsvApiTestBase extends BaseTest {
         }
 
         SoftAssert.assertAll();
+    }
+    
+    protected CsvReaderApi readCsvFileNotContainHeaders(String csvPath) throws AutomationTestException {
+        CsvReaderApi csv = null;
+
+        try {
+            csv = new CsvReaderApi(csvPath, false);
+        } catch (IOException e) {
+            throw new AutomationTestException(e);
+        }
+
+        return csv;
     }
     
     protected CsvReaderApi readCsvFile(String csvPath) throws AutomationTestException {

@@ -15,7 +15,7 @@ import org.eltn.projects.core.base.ObjectBase;
 public abstract class CsvApiBase extends ObjectBase {
     public static final char CELLS_DEFAULT_SPLITTER = CellsSplitterEnum.COMMA.getChar();
 
-    protected final String path;
+    protected final String filePath;
     protected List<String> headerList = new ArrayList<String>();
     protected final List<List<String>> csvRows = new ArrayList<List<String>>();
     
@@ -24,11 +24,11 @@ public abstract class CsvApiBase extends ObjectBase {
     /***********************************************
      * Constructor.
      * 
-     * @param path CSV file path.
+     * @param filePath CSV file path.
      * @param cellsSplitter Cells Splitter char.
      */
-    protected CsvApiBase(String path, char cellsSplitter) {
-        this.path = path;
+    protected CsvApiBase(String filePath, char cellsSplitter) {
+        this.filePath = filePath;
         this.cellsSplitter = cellsSplitter;
     }
 }

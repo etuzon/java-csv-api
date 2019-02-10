@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.List;
 
+import org.eltn.java.csv.enums.CellsSplitterEnum;
 import org.eltn.java.csv.exceptions.CsvOperationException;
 import org.eltn.projects.core.expections.InvalidValueException;
 import org.eltn.projects.core.utils.StringUtil;
@@ -30,7 +31,7 @@ public class CsvWriterApi extends CsvApiBase {
     private int rowSize = -1;
 
     private boolean isCsvSaved = false;
-    
+
     private boolean isSetHeaders = false;
 
     private Writer writer = null;
@@ -39,20 +40,30 @@ public class CsvWriterApi extends CsvApiBase {
     /*********************************************
      * Constructor.
      * 
-     * @param path CSV file path.
+     * @param filePath CSV file path.
      */
-    public CsvWriterApi(String path) {
-        this(path, CELLS_DEFAULT_SPLITTER);
+    public CsvWriterApi(String filePath) {
+        this(filePath, CELLS_DEFAULT_SPLITTER);
     }
 
     /*********************************************
      * Constructor.
      * 
-     * @param path CSV file path.
+     * @param filePath CSV file path.
+     * @param cellsSplitter Cells splitter enum.
+     */
+    public CsvWriterApi(String filePath, CellsSplitterEnum cellsSplitter) {
+        this(filePath, cellsSplitter.getChar());
+    }
+
+    /*********************************************
+     * Constructor.
+     * 
+     * @param filePath CSV file path.
      * @param cellsSplitter Cells splitter char.
      */
-    public CsvWriterApi(String path, char cellsSplitter) {
-        super(path, cellsSplitter);
+    public CsvWriterApi(String filePath, char cellsSplitter) {
+        super(filePath, cellsSplitter);
     }
 
     /*********************************************
@@ -60,7 +71,8 @@ public class CsvWriterApi extends CsvApiBase {
      * Headers can be set only one time.
      * 
      * @param headerList Header list.
-     * @throws CsvOperationException in case user call the method more than one time, or run {@link #setHeaders(List)} after running {@link #save()} method.
+     * @throws CsvOperationException in case user call the method more than one time, 
+     *                               or run {@link #setHeaders(List)} after running {@link #save()} method.
      * @throws InvalidValueException in case header list is null or headers amount is different from row size.
      */
     public void setHeaders(final List<String> headerList) throws CsvOperationException, InvalidValueException {
@@ -71,7 +83,7 @@ public class CsvWriterApi extends CsvApiBase {
         if (isCsvSaved()) {
             throw new CsvOperationException("Headers cannot be set after save CSV file");
         }
-        
+
         validateNotNull(headerList);
 
         isSetHeaders = true;
@@ -91,10 +103,10 @@ public class CsvWriterApi extends CsvApiBase {
      */
     public void addRow(List<String> row) throws InvalidValueException, CsvOperationException {
         if (isCsvSaved()) {
-            throw new CsvOperationException("Row cannot be added because CSV file [" + path + "] already saved");
+            throw new CsvOperationException("Row cannot be added because CSV file [" + filePath + "] already saved");
         }
-        
-        validateNotNull(row);     
+
+        validateNotNull(row);
         updateRowSizeBeforeUpdateRow(row);
         csvRows.add(row);
     }
@@ -109,11 +121,12 @@ public class CsvWriterApi extends CsvApiBase {
      * @throws IndexOutOfBoundsException in case index is out of row bounds.
      * @throws CsvOperationException in case run adding a row after CSV file already been saved.
      */
-    public void addRow(List<String> row, int index) throws InvalidValueException, IndexOutOfBoundsException, CsvOperationException {
+    public void addRow(List<String> row, int index)
+            throws InvalidValueException, IndexOutOfBoundsException, CsvOperationException {
         if (isCsvSaved()) {
-            throw new CsvOperationException("Row cannot be added because CSV file [" + path + "] already saved");
+            throw new CsvOperationException("Row cannot be added because CSV file [" + filePath + "] already saved");
         }
-        
+
         validateNotNull(row);
         validateNotNegative(index);
 
@@ -154,9 +167,9 @@ public class CsvWriterApi extends CsvApiBase {
      */
     public void removeRow(int index) throws InvalidValueException, IndexOutOfBoundsException, CsvOperationException {
         if (isCsvSaved()) {
-            throw new CsvOperationException("Row cannot be removed because CSV file [" + path + "] already saved");
+            throw new CsvOperationException("Row cannot be removed because CSV file [" + filePath + "] already saved");
         }
-        
+
         validateNotNegative(index);
 
         if (csvRows.size() <= index) {
@@ -178,9 +191,9 @@ public class CsvWriterApi extends CsvApiBase {
      */
     public void save() throws IOException, CsvOperationException {
         if (isCsvSaved()) {
-            throw new CsvOperationException("CSV file [" + path + "] already been saved");
+            throw new CsvOperationException("CSV file [" + filePath + "] already been saved");
         }
-        
+
         try {
             openFileAndSetPrintWriter();
             writeCsvHeadersRowToFile();
@@ -191,10 +204,15 @@ public class CsvWriterApi extends CsvApiBase {
         }
     }
 
+    /*********************************************
+     * Is {@link #save()} was executed.
+     * 
+     * @return true in case CSV file was saved, else return false.
+     */
     public boolean isCsvSaved() {
         return isCsvSaved;
     }
-    
+
     private void closeFile() {
         try {
             if (printWriter != null) {
@@ -224,7 +242,7 @@ public class CsvWriterApi extends CsvApiBase {
     }
 
     private void openFileAndSetPrintWriter() throws IOException {
-        File file = new File(path);
+        File file = new File(filePath);
         writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
         printWriter = new PrintWriter(writer);
     }

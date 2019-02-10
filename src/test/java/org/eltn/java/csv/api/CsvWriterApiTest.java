@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eltn.java.csv.enums.CellsSplitterEnum;
 import org.eltn.java.csv.exceptions.CsvOperationException;
 import org.eltn.projects.core.expections.InvalidValueException;
 import org.eltn.projects.core.tests.asserts.SoftAssert;
@@ -16,7 +17,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class CscWriterApiTest extends CsvApiTestBase implements TestParameters {
+public class CsvWriterApiTest extends CsvApiTestBase implements TestParameters {
     public static final String DIR_PATH = "src/test/resources/createCsv/";
 
     public static final String CSV_PATH = DIR_PATH + "tempCsv.csv";
@@ -81,8 +82,8 @@ public class CscWriterApiTest extends CsvApiTestBase implements TestParameters {
         }
 
         SoftAssert.assertTrueNow(isCsvOperationException,
-                "setHeaders did not throwed CsvOperationException after called the method twice",
-                "Verify that setHeaders throwed CsvOperationException after called the method twice");
+                "setHeaders did not throwed CsvOperationException after running the method second time",
+                "Verify that setHeaders throwed CsvOperationException after running the method second time");
     }
 
     @Test
@@ -103,6 +104,64 @@ public class CscWriterApiTest extends CsvApiTestBase implements TestParameters {
         saveCsv();
 
         verifyDefaultCsv();
+    }
+
+    @Test
+    public void run_save_twice_negative_test() throws AutomationTestException {
+        csvApi = new CsvWriterApi(CSV_PATH);
+        setHeaders(DEFAULT_CSV_HEADERS);
+        saveCsv();
+
+        boolean isCsvOperationException = false;
+
+        try {
+            csvApi.save();
+        } catch (CsvOperationException e) {
+            isCsvOperationException = true;
+        } catch (IOException e) {
+            throw new AutomationTestException(e);
+        }
+
+        SoftAssert.assertTrueNow(isCsvOperationException,
+                "save() did not throwed CsvOperationException after running the method second time",
+                "Verify that save() throw CsvOperationException after running the method second time");
+    }
+
+    @Test
+    public void create_empty_csv_file_test() throws AutomationTestException {
+        csvApi = new CsvWriterApi(CSV_PATH);
+        saveCsv();
+
+        File file = new File(CSV_PATH);
+        SoftAssert.assertTrueNow(file.exists(), "CSV file [" + CSV_PATH + "] not exists",
+                "Verify that [" + CSV_PATH + "] exists");
+        SoftAssert.assertTrueNow(file.length() == 0,
+                "CSV file should be empty but file size is [" + file.length() + "]", "Verify that CSV file is empty");
+    }
+
+    @Test
+    public void create_default_csv_without_headers_test() throws AutomationTestException {
+        csvApi = new CsvWriterApi(CSV_PATH);
+        addRowsViaCsvApiAddRows(DEFAULT_CSV_BODY);
+        saveCsv();
+        verifyCsvThatNotContainHeaders(CSV_PATH, DEFAULT_CSV_BODY, GetRowEnum.GET_ROWS);
+    }
+    
+    @Test
+    public void create_default_csv_that_contain_only_headers_test() throws AutomationTestException {
+        csvApi = new CsvWriterApi(CSV_PATH);
+        setHeaders(DEFAULT_CSV_HEADERS);
+        saveCsv();
+        verifyCsv(CSV_PATH, DEFAULT_CSV_HEADERS, new String[][] {}, GetRowEnum.GET_ROWS);
+    }
+    
+    @Test 
+    public void create_default_csv_with_tab_as_separator_char_test() throws AutomationTestException {
+        csvApi = new CsvWriterApi(CSV_PATH, CellsSplitterEnum.TAB);
+        setHeaders(DEFAULT_CSV_HEADERS);
+        addRowsViaCsvApiAddRows(DEFAULT_CSV_BODY);
+        saveCsv();
+        verifyCsv(CSV_PATH, DEFAULT_CSV_HEADERS, DEFAULT_CSV_BODY, CellsSplitterEnum.TAB, GetRowEnum.GET_ROWS);
     }
 
     @AfterClass
@@ -205,7 +264,7 @@ public class CscWriterApiTest extends CsvApiTestBase implements TestParameters {
             throw new AutomationTestException(e);
         }
     }
-    
+
     private void addRow(String[] row) throws AutomationTestException {
         try {
             csvApi.addRow(ListUtil.asList(row));

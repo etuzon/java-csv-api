@@ -21,7 +21,8 @@ import org.eltn.projects.core.utils.StringUtil;
  * 
  */
 public class CsvReaderApi extends CsvApiBase {
-    
+    public static final boolean CSV_CONTAIN_HEADERS = true;
+
     private String cell = "";
     private List<String> cellsInLine = new ArrayList<String>();
     private boolean isCellInInvertedComma = false;
@@ -29,36 +30,62 @@ public class CsvReaderApi extends CsvApiBase {
     /*********************************
      * Constructor.
      *
-     * @param path CSV file path.
-     * @throws IOException In case fail read CSV file.
+     * @param filePath CSV file path.
+     * @throws IOException in case fail read CSV file.
      */
-    public CsvReaderApi(String path) throws IOException {
-        this(path, CELLS_DEFAULT_SPLITTER);
+    public CsvReaderApi(String filePath) throws IOException {
+        this(filePath, CELLS_DEFAULT_SPLITTER);
     }
 
     /********************************
      * Constructor.
      *
-     * @param path CSV file path.
+     * @param filePath CSV file path.
      * @param cellsSplitter CSV cells splitter enum.
-     * @throws IOException In case fail read CSV file.
+     * @throws IOException in case fail read CSV file.
      */
-    public CsvReaderApi(String path, CellsSplitterEnum cellsSplitter) throws IOException {
-        this(path, cellsSplitter.getChar());
+    public CsvReaderApi(String filePath, CellsSplitterEnum cellsSplitter) throws IOException {
+        this(filePath, cellsSplitter.getChar());
+    }
+
+    /********************************
+     * Constructor.
+     * 
+     * @param filePath CSV file path.
+     * @param isCsvContainHeaders true in case CSV file contain headers, else the value is false.
+     * @throws IOException in case fail read CSV file.
+     */
+    public CsvReaderApi(String filePath, boolean isCsvContainHeaders) throws IOException {
+        this(filePath, CELLS_DEFAULT_SPLITTER, isCsvContainHeaders);
+    }
+    
+    /********************************
+     * Constructor.
+     * 
+     * @param filePath CSV file path.
+     * @param cellsSplitter Cells splitter char.
+     * @throws IOException in case fail read CSV file.
+     */
+    public CsvReaderApi(String filePath, char cellsSplitter) throws IOException {
+        this(filePath, cellsSplitter, CSV_CONTAIN_HEADERS);
     }
 
     /*******************************
      * Constructor.
      *
-     * @param path CSV file path.
+     * @param filePath CSV file path.
      * @param cellsSplitter CSV cells splitter char.
-     * @throws IOException In case fail read CSV file.
+     * @param isCsvContainHeaders true in case CSV file contain headers, else the value is false.
+     * @throws IOException in case fail read CSV file.
      */
-    public CsvReaderApi(String path, char cellsSplitter) throws IOException {
-        super(path, cellsSplitter);
+    public CsvReaderApi(String filePath, char cellsSplitter, final boolean isCsvContainHeaders) throws IOException {
+        super(filePath, cellsSplitter);
 
-        parseCsv(path);
-        setHeaderList();
+        parseCsv(filePath);
+
+        if (isCsvContainHeaders) {
+            setHeaderList();
+        }
     }
 
     /******************************
@@ -227,7 +254,7 @@ public class CsvReaderApi extends CsvApiBase {
      * @return CSV file path.
      */
     public String getPath() {
-        return path;
+        return filePath;
     }
 
     /*******************************
@@ -385,8 +412,7 @@ public class CsvReaderApi extends CsvApiBase {
      * Remove the additional inverted commas that * the csv add to the cells
      * 
      * @param cell
-     *            *
-     * @return *
+     * @return
      ********************************************************************/
     private String removeCsvInvertedCommasInCell(String cell) {
         if (cell == null) {
