@@ -1,4 +1,4 @@
-package org.eltn.java.csv.enums;
+package io.github.tuzon.java.csv.enums;
 
 /*********************************
  * Cells splitter enum.

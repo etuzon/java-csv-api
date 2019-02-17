@@ -1,4 +1,4 @@
-package org.eltn.java.csv.api;
+package io.github.tuzon.java.csv.api;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,10 +8,10 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.List;
 
-import org.eltn.java.csv.enums.CellsSplitterEnum;
-import org.eltn.java.csv.exceptions.CsvOperationException;
-import org.eltn.projects.core.expections.InvalidValueException;
-import org.eltn.projects.core.utils.StringUtil;
+import io.github.tuzon.java.csv.enums.CellsSplitterEnum;
+import io.github.tuzon.java.csv.exceptions.CsvOperationException;
+import io.github.tuzon.projects.core.expections.InvalidValueException;
+import io.github.tuzon.projects.core.utils.StringUtil;
 
 /*********************************************
  * CSV writer API.

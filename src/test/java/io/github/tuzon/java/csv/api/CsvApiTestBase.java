@@ -1,15 +1,15 @@
-package org.eltn.java.csv.api;
+package io.github.tuzon.java.csv.api;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.eltn.java.csv.enums.CellsSplitterEnum;
-import org.eltn.projects.core.expections.InvalidValueException;
-import org.eltn.projects.core.tests.asserts.SoftAssert;
-import org.eltn.projects.core.tests.base.BaseTest;
-import org.eltn.projects.core.tests.exceptions.AutomationTestException;
-import org.eltn.projects.core.utils.ListUtil;
-import org.eltn.projects.core.utils.StringUtil;
+import io.github.tuzon.java.csv.enums.CellsSplitterEnum;
+import io.github.tuzon.projects.core.expections.InvalidValueException;
+import io.github.tuzon.projects.core.tests.asserts.SoftAssert;
+import io.github.tuzon.projects.core.tests.base.BaseTest;
+import io.github.tuzon.projects.core.tests.exceptions.AutomationTestException;
+import io.github.tuzon.projects.core.utils.ListUtil;
+import io.github.tuzon.projects.core.utils.StringUtil;
 
 public abstract class CsvApiTestBase extends BaseTest {
     protected enum GetRowEnum {

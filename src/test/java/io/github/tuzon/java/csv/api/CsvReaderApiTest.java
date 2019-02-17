@@ -1,14 +1,15 @@
-package org.eltn.java.csv.api;
+package io.github.tuzon.java.csv.api;
 
 import java.util.List;
 
-import org.eltn.java.csv.enums.CellsSplitterEnum;
-import org.eltn.projects.core.expections.InvalidValueException;
-import org.eltn.projects.core.tests.asserts.SoftAssert;
-import org.eltn.projects.core.tests.exceptions.AutomationTestException;
-import org.eltn.projects.core.utils.ListUtil;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import io.github.tuzon.java.csv.enums.CellsSplitterEnum;
+import io.github.tuzon.projects.core.expections.InvalidValueException;
+import io.github.tuzon.projects.core.tests.asserts.SoftAssert;
+import io.github.tuzon.projects.core.tests.exceptions.AutomationTestException;
+import io.github.tuzon.projects.core.utils.ListUtil;
 
 public class CsvReaderApiTest extends CsvApiTestBase implements TestParameters {
 	public static final String DIR_PATH = "src/test/resources/csvFiles/";

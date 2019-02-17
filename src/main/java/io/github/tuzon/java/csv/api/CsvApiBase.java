@@ -1,10 +1,10 @@
-package org.eltn.java.csv.api;
+package io.github.tuzon.java.csv.api;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eltn.java.csv.enums.CellsSplitterEnum;
-import org.eltn.projects.core.base.ObjectBase;
+import io.github.tuzon.java.csv.enums.CellsSplitterEnum;
+import io.github.tuzon.projects.core.base.ObjectBase;
 
 /***********************************************
  * Base class to CSV API.
