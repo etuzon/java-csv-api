@@ -4,39 +4,11 @@
 
 	<artifactId>java.csv.api</artifactId>
 	
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 
 	<name>CSV API</name>
 
-    <description>Java CSV Reader/writer API.\
-    \
-    API support multiline fields, and custom separators.\
-    \
-    Example of multiline CSV:\
-    \
-    header1,"header\
-    2",header3\
-    field1,field2,"field\
-    3"\
-    \
-    \
-    Code Example:\
-    \
-    CsvReaderApi csvReader = new CsvReaderApi(CSV_PATH);\
-    \
-    List&lt;String&gt; headerList = csvReader.getHeaderList();\
-    List&lt;List&lt;String&gt;&gt; rowsList = csvReader.getRows();\
-    \
-    //Now file will be overwritten\
-    CsvWriterApi csvWriter = new CsvWriterApi(CSV_PATH);\
-    csvWriter.setHeaders(headerList);\
-    csvWriter.addRows(rowsList);\
-    //Add new Row that one of the fields is multiline field\
-    //ListUtil.asList is method in Java-Projects-Core\
-    List&lt;String&gt; row = ListUtil.asList("1", "2\n123", "3");\
-    csvWriter.addRow(row);\
-    //save to file\
-    csvWriter.save();\</description>
+    <description>Java CSV reader/writer API. API support multiline fields, and custom separators.</description>
 
     <url>https://github.com/tuzon/Java-CSV-API</url>
 
