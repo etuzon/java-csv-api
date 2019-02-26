@@ -4,17 +4,17 @@
 
 	<artifactId>java.csv.api</artifactId>
 	
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 
 	<name>CSV API</name>
 
     <description>Java CSV reader/writer API. API support multiline fields, and custom separators.</description>
 
-    <url>https://github.com/tuzon/Java-CSV-API</url>
+    <url>https://github.com/etuzon/Java-CSV-API</url>
 
     <scm>
-        <url>https://github.com/tuzon/Java-CSV-API</url>
-        <connection>https://github.com/tuzon/Java-CSV-API.git</connection>
+        <url>https://github.com/etuzon/Java-CSV-API</url>
+        <connection>https://github.com/etuzon/Java-CSV-API.git</connection>
     </scm>
 
 	<licenses>
@@ -26,9 +26,9 @@
 	</licenses>
 
 	<parent>
-		<groupId>io.github.tuzon</groupId>
+		<groupId>io.github.etuzon</groupId>
 		<artifactId>java.base.pom</artifactId>
-		<version>1.0.12-base</version>
+		<version>1.0.14-base</version>
 	</parent>
 
 	<properties>
@@ -39,9 +39,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>io.github.tuzon</groupId>
+			<groupId>io.github.etuzon</groupId>
 			<artifactId>java.projects.core</artifactId>
-			<version>1.0.10</version>
+			<version>1.0.12</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jdom</groupId>

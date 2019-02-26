@@ -1,6 +1,6 @@
-package io.github.tuzon.java.csv.exceptions;
+package io.github.etuzon.java.csv.exceptions;
 
-import io.github.tuzon.projects.core.expections.EltnExceptionBase;
+import io.github.etuzon.projects.core.expections.EltnExceptionBase;
 
 /**************************************************
  * Exception for illegal operation.

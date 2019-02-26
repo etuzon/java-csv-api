@@ -1,4 +1,4 @@
-package io.github.tuzon.java.csv.api;
+package io.github.etuzon.java.csv.api;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,9 +10,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.tuzon.java.csv.enums.CellsSplitterEnum;
-import io.github.tuzon.projects.core.expections.InvalidValueException;
-import io.github.tuzon.projects.core.utils.StringUtil;
+import io.github.etuzon.java.csv.enums.CellsSplitterEnum;
+import io.github.etuzon.projects.core.expections.InvalidValueException;
+import io.github.etuzon.projects.core.utils.StringUtil;
 
 /*************************************************
  * Parse CSV file.

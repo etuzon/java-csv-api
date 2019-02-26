@@ -1,4 +1,4 @@
-package io.github.tuzon.java.csv.api;
+package io.github.etuzon.java.csv.api;
 
 public interface TestParameters {
     public static final String[] DEFAULT_CSV_HEADERS = { "header1", "header2", "header3" };

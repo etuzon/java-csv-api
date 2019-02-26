@@ -1,17 +1,17 @@
-package io.github.tuzon.java.csv.api;
+package io.github.etuzon.java.csv.api;
 
 import java.io.IOException;
 import java.util.List;
 
-import io.github.tuzon.java.csv.enums.CellsSplitterEnum;
-import io.github.tuzon.projects.core.expections.InvalidValueException;
-import io.github.tuzon.projects.core.tests.asserts.SoftAssert;
-import io.github.tuzon.projects.core.tests.base.BaseTest;
-import io.github.tuzon.projects.core.tests.exceptions.AutomationTestException;
-import io.github.tuzon.projects.core.utils.ListUtil;
-import io.github.tuzon.projects.core.utils.StringUtil;
+import io.github.etuzon.java.csv.enums.CellsSplitterEnum;
+import io.github.etuzon.projects.core.expections.InvalidValueException;
+import io.github.etuzon.projects.core.utils.ListUtil;
+import io.github.etuzon.projects.core.utils.StringUtil;
+import io.github.etuzon.unit.tests.asserts.SoftAssertUnitTest;
+import io.github.etuzon.unit.tests.base.BaseUnitTest;
+import io.github.etuzon.unit.tests.exceptions.AutomationUnitTestException;
 
-public abstract class CsvApiTestBase extends BaseTest {
+public abstract class CsvApiTestBase extends BaseUnitTest {
     protected enum GetRowEnum {
         GET_ROW, GET_ROWS
     }
@@ -25,102 +25,102 @@ public abstract class CsvApiTestBase extends BaseTest {
     }
     
     protected void verifyCsv(String csvPath, String[] expectedCsvHeaders, String[][] expectedCsvBody,
-            CellsSplitterEnum cellSplitter, GetRowEnum getRowEnum) throws AutomationTestException {
+            CellsSplitterEnum cellSplitter, GetRowEnum getRowEnum) throws AutomationUnitTestException {
         try {
             CsvReaderApi csv = readCsvFile(csvPath, cellSplitter);
             verifyCsvHeaders(csv, expectedCsvHeaders);
             verifyCsvBody(csv, expectedCsvBody, getRowEnum);
         } finally {
-            SoftAssert.assertAll();
+            SoftAssertUnitTest.assertAll();
         }
     }
    
     protected void verifyCsvThatNotContainHeaders(String csvPath, String[][] expectedCsvBody,
-            GetRowEnum getRowEnum) throws AutomationTestException {
+            GetRowEnum getRowEnum) throws AutomationUnitTestException {
         try {
             CsvReaderApi csv = readCsvFileNotContainHeaders(csvPath);
             verifyCsvBody(csv, expectedCsvBody, getRowEnum);
         } finally {
-            SoftAssert.assertAll();
+            SoftAssertUnitTest.assertAll();
         }
     }
     
     protected void verifyCsv(String csvPath, String[] expectedCsvHeaders, String[][] expectedCsvBody,
-            GetRowEnum getRowEnum) throws AutomationTestException {
+            GetRowEnum getRowEnum) throws AutomationUnitTestException {
         try {
             CsvReaderApi csv = readCsvFile(csvPath);
             verifyCsvHeaders(csv, expectedCsvHeaders);
             verifyCsvBody(csv, expectedCsvBody, getRowEnum);
         } finally {
-            SoftAssert.assertAll();
+            SoftAssertUnitTest.assertAll();
         }
     }
 
     private void verifyCsvBody(CsvReaderApi csv, String[][] expectedBody, GetRowEnum getRowEnum)
-            throws AutomationTestException {
+            throws AutomationUnitTestException {
         try {
             for (int i = 0; i < expectedBody.length; i++) {
                 List<String> currentRow = getRow(i, getRowEnum, csv);
 
-                if (SoftAssert.assertTrue(expectedBody[i].length == currentRow.size(),
+                if (SoftAssertUnitTest.assertTrue(expectedBody[i].length == currentRow.size(),
                         "Row number [" + (i + 1) + "] size in csv file [" + csv.getPath() + "] is [" + currentRow.size()
                                 + "] and should be [" + expectedBody[i].length + "]")) {
                     verifyCsvLine(currentRow, ListUtil.asList(expectedBody[i]), i, csv.getPath());
                 }
             }
         } catch (Exception e) {
-            throw new AutomationTestException(e);
+            throw new AutomationUnitTestException(e);
         }
     }
     
     protected void verifyCsvHeaders(CsvReaderApi csv, String[] expectedHeaders) {
         final int EXPECTED_HEADER_AMOUNT = expectedHeaders.length;
-        SoftAssert.assertTrueNow(csv.getHeaderList().size() == EXPECTED_HEADER_AMOUNT,
+        SoftAssertUnitTest.assertTrueNow(csv.getHeaderList().size() == EXPECTED_HEADER_AMOUNT,
                 "Headers amount is [" + csv.getHeaderList().size() + "] and should be [" + EXPECTED_HEADER_AMOUNT
                         + "]. Headers [" + ListUtil.getMultilineStringFromList(csv.getHeaderList()) + "]",
                 "Verify header amount is [" + EXPECTED_HEADER_AMOUNT + "]");
 
         for (int i = 0; i < expectedHeaders.length; i++) {
-            SoftAssert.assertTrueNow(csv.getHeaderList().get(i).equals(expectedHeaders[i]),
+            SoftAssertUnitTest.assertTrueNow(csv.getHeaderList().get(i).equals(expectedHeaders[i]),
                     "Header in index [" + i + "] is [" + csv.getHeaderList().get(i) + "] and should be ["
                             + expectedHeaders[i] + "]",
                     "Verify header in index [" + i + "] is [" + expectedHeaders[i] + "]");
         }
 
-        SoftAssert.assertAll();
+        SoftAssertUnitTest.assertAll();
     }
     
-    protected CsvReaderApi readCsvFileNotContainHeaders(String csvPath) throws AutomationTestException {
+    protected CsvReaderApi readCsvFileNotContainHeaders(String csvPath) throws AutomationUnitTestException {
         CsvReaderApi csv = null;
 
         try {
             csv = new CsvReaderApi(csvPath, false);
         } catch (IOException e) {
-            throw new AutomationTestException(e);
+            throw new AutomationUnitTestException(e);
         }
 
         return csv;
     }
     
-    protected CsvReaderApi readCsvFile(String csvPath) throws AutomationTestException {
+    protected CsvReaderApi readCsvFile(String csvPath) throws AutomationUnitTestException {
         CsvReaderApi csv = null;
 
         try {
             csv = new CsvReaderApi(csvPath);
         } catch (IOException e) {
-            throw new AutomationTestException(e);
+            throw new AutomationUnitTestException(e);
         }
 
         return csv;
     }
     
-    protected CsvReaderApi readCsvFile(String csvPath, CellsSplitterEnum cellSpliter) throws AutomationTestException {
+    protected CsvReaderApi readCsvFile(String csvPath, CellsSplitterEnum cellSpliter) throws AutomationUnitTestException {
         CsvReaderApi csv = null;
 
         try {
             csv = new CsvReaderApi(csvPath, cellSpliter);
         } catch (IOException e) {
-            throw new AutomationTestException(e);
+            throw new AutomationUnitTestException(e);
         }
 
         return csv;
@@ -129,7 +129,7 @@ public abstract class CsvApiTestBase extends BaseTest {
     private void verifyCsvLine(List<String> currentRow, List<String> expectedRow, int rowIndex, String csvPath)
             throws Exception {
         int rowNumber = rowIndex + 2;
-        if (SoftAssert.assertTrue(expectedRow.size() == currentRow.size(),
+        if (SoftAssertUnitTest.assertTrue(expectedRow.size() == currentRow.size(),
                 "Row number [" + rowNumber + "] size in csv file [" + csvPath + "] is [" + currentRow.size()
                         + "] and should be [" + expectedRow.size() + "]")) {
 
@@ -143,8 +143,8 @@ public abstract class CsvApiTestBase extends BaseTest {
                 String cellLocationStr = StringUtil.replace(CELL_LOCATION_STR_TEMPLATE, String.valueOf(rowNumber),
                         String.valueOf(columnNumber), csvPath);
 
-                if (SoftAssert.assertTrue(currentCell != null, cellLocationCapitalStr + " should not be null")) {
-                    SoftAssert.assertTrue(expectedCell.equals(currentCell),
+                if (SoftAssertUnitTest.assertTrue(currentCell != null, cellLocationCapitalStr + " should not be null")) {
+                    SoftAssertUnitTest.assertTrue(expectedCell.equals(currentCell),
                             cellLocationStr + " value is [" + currentCell + "] and should be [" + expectedCell + "]",
                             "Verify that " + cellLocationStr + " value is [" + expectedCell + "]");
                 }
