@@ -1,6 +1,6 @@
 package io.github.etuzon.java.csv.exceptions;
 
-import io.github.etuzon.projects.core.expections.EltnExceptionBase;
+import io.github.etuzon.projects.core.expections.EtuzonExceptionBase;
 
 /**************************************************
  * Exception for illegal operation.
@@ -8,7 +8,7 @@ import io.github.etuzon.projects.core.expections.EltnExceptionBase;
  * @author Eyal Tuzon
  *
  */
-public class CsvOperationException extends EltnExceptionBase {
+public class CsvOperationException extends EtuzonExceptionBase {
 
     private static final long serialVersionUID = 1L;
     

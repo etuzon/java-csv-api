@@ -27,6 +27,8 @@ public class CsvWriterApiTest extends CsvApiTestBase implements TestParameters {
 
     @BeforeClass
     public void beforeClass() {
+    	File dirPath = new File(DIR_PATH);
+    	dirPath.mkdirs();
     }
 
     @BeforeMethod
@@ -168,6 +170,8 @@ public class CsvWriterApiTest extends CsvApiTestBase implements TestParameters {
     @AfterClass
     public void afterClass() {
         deleteFileIfExists(CSV_PATH);
+        File dirPath = new File(DIR_PATH);
+        dirPath.delete();
     }
 
     private void deleteFileIfExists(String filePath) {
