@@ -49,7 +49,8 @@ public class CsvWriterApiTest extends CsvApiTestBase implements TestParameters {
     }
 
     @Test
-    public void create_new_csv_set_headers_and_add_rows_without_save_negative_test() throws AutomationUnitTestException {
+    public void create_new_csv_set_headers_and_add_rows_without_save_negative_test()
+            throws AutomationUnitTestException {
         createDefaultCsvAddRowsCsvWithoutSave();
         verifyFileNotExists(CSV_PATH);
         csvApi = null;
@@ -84,14 +85,15 @@ public class CsvWriterApiTest extends CsvApiTestBase implements TestParameters {
             isCsvOperationException = true;
         }
 
-        SoftAssertUnitTest.assertTrueNow(isCsvOperationException,
-                "setHeaders did not throwed CsvOperationException after running the method second time",
-                "Verify that setHeaders throwed CsvOperationException after running the method second time");
+        SoftAssertUnitTest.assertTrueNow(
+                isCsvOperationException,
+                "setHeaders did not thrown CsvOperationException after running the method second time",
+                "Verify that setHeaders thrown CsvOperationException after running the method second time");
     }
 
     @Test
-    public void remove_row_from_complex_csv_test()
-            throws AutomationUnitTestException, InvalidValueException, IndexOutOfBoundsException, CsvOperationException {
+    public void remove_row_from_complex_csv_test() throws AutomationUnitTestException,
+            InvalidValueException, IndexOutOfBoundsException, CsvOperationException {
         createComplexCsvAddRowsCsvWithoutSave();
         csvApi.removeRow(0);
         saveCsv();
@@ -125,8 +127,9 @@ public class CsvWriterApiTest extends CsvApiTestBase implements TestParameters {
             throw new AutomationUnitTestException(e);
         }
 
-        SoftAssertUnitTest.assertTrueNow(isCsvOperationException,
-                "save() did not throwed CsvOperationException after running the method second time",
+        SoftAssertUnitTest.assertTrueNow(
+                isCsvOperationException,
+                "save() did not thrown CsvOperationException after running the method second time",
                 "Verify that save() throw CsvOperationException after running the method second time");
     }
 
@@ -136,10 +139,14 @@ public class CsvWriterApiTest extends CsvApiTestBase implements TestParameters {
         saveCsv();
 
         File file = new File(CSV_PATH);
-        SoftAssertUnitTest.assertTrueNow(file.exists(), "CSV file [" + CSV_PATH + "] not exists",
+        SoftAssertUnitTest.assertTrueNow(
+                file.exists(),
+                "CSV file [" + CSV_PATH + "] not exists",
                 "Verify that [" + CSV_PATH + "] exists");
-        SoftAssertUnitTest.assertTrueNow(file.length() == 0,
-                "CSV file should be empty but file size is [" + file.length() + "]", "Verify that CSV file is empty");
+        SoftAssertUnitTest.assertTrueNow(
+                file.length() == 0,
+                "CSV file should be empty but file size is ["
+                + file.length() + "]", "Verify that CSV file is empty");
     }
 
     @Test
@@ -182,9 +189,10 @@ public class CsvWriterApiTest extends CsvApiTestBase implements TestParameters {
     private void verifyFileNotExists(String filePath) throws AutomationUnitTestException {
         File file = new File(CSV_PATH);
 
-        if (SoftAssertUnitTest.assertTrue(file.exists() == false,
+        if (!SoftAssertUnitTest.assertTrue(
+                !file.exists(),
                 "CSV file [" + filePath + " should be be exists because save() method was not executed",
-                "Verify that CSV file [" + filePath + " not exists") == false) {
+                "Verify that CSV file [" + filePath + " not exists")) {
             deleteFile(CSV_PATH);
         }
 
@@ -194,8 +202,9 @@ public class CsvWriterApiTest extends CsvApiTestBase implements TestParameters {
     private void deleteFile(String filePath) throws AutomationUnitTestException {
         File file = new File(CSV_PATH);
         try {
-            if (Files.deleteIfExists(file.toPath()) == false) {
-                throw new AutomationUnitTestException("Cannot delete file [" + CSV_PATH + "] because it is not exists");
+            if (!Files.deleteIfExists(file.toPath())) {
+                throw new AutomationUnitTestException(
+                        "Cannot delete file [" + CSV_PATH + "] because it is not exists");
             }
         } catch (IOException e) {
             throw new AutomationUnitTestException(e);
@@ -285,7 +294,7 @@ public class CsvWriterApiTest extends CsvApiTestBase implements TestParameters {
     }
 
     private void addRowsViaCsvApiAddRows(String[][] rows) throws AutomationUnitTestException {
-        List<List<String>> rowsList = new ArrayList<List<String>>();
+        List<List<String>> rowsList = new ArrayList<>();
 
         for (String[] row : rows) {
             rowsList.add(ListUtil.asList(row));

@@ -7,17 +7,16 @@ import io.github.etuzon.java.csv.enums.CellsSplitterEnum;
 import io.github.etuzon.projects.core.base.ObjectBase;
 
 /***********************************************
- * Base class to CSV API.
+ * CSV API base class.
  * 
  * @author Eyal Tuzon
- *
  */
 public abstract class CsvApiBase extends ObjectBase {
     public static final char CELLS_DEFAULT_SPLITTER = CellsSplitterEnum.COMMA.getChar();
 
     protected final String filePath;
-    protected List<String> headerList = new ArrayList<String>();
-    protected final List<List<String>> csvRows = new ArrayList<List<String>>();
+    protected List<String> headerList = new ArrayList<>();
+    protected final List<List<String>> csvRows = new ArrayList<>();
     
     protected final char cellsSplitter;
     

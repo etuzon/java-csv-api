@@ -1,8 +1,8 @@
-![Maven Central](https://img.shields.io/maven-central/v/io.github.etuzon/java.csv.api?style=plastic)
-![GitHub](https://img.shields.io/github/license/etuzon/Java-CSV-API?style=plastic)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/etuzon/Java-CSV-API?style=plastic)
+![Maven Central](https://img.shields.io/maven-central/v/io.github.etuzon/csv-api?style=plastic)
+![GitHub](https://img.shields.io/github/license/etuzon/java-csv-api?style=plastic)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/etuzon/java-csv-api?style=plastic)
 
-# Java-CSV-API
+# CSV API
 
 Java CSV Reader/writer API.
 
@@ -10,7 +10,7 @@ API support multiple lines fields, and custom separators.
     
 Example of multiple line CSV:
 
-``` text    
+``` text
 header1,"header
 2",header3
 field1,field2,"field
