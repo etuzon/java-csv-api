@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import io.github.etuzon.java.csv.enums.CellsSplitterEnum;
@@ -14,17 +15,16 @@ import io.github.etuzon.projects.core.expections.InvalidValueException;
 import io.github.etuzon.projects.core.utils.StringUtil;
 /*********************************************
  * CSV writer API.
- * 
+ * <p>
  * Create CSV file.
  * API create new CSV.
  * In case the file already exists than the file will be overwritten.
- * 
+ * <p>
  * The file will be created only after execute {@link CsvWriterApi#save()} method.
- * 
+ * <p>
  * CSV writer API can use {@link CsvWriterApi#save()} only one time.
  * 
  * @author Eyal Tuzon
- *
  */
 public class CsvWriterApi extends CsvApiBase {
     private int rowSize = -1;
@@ -74,9 +74,11 @@ public class CsvWriterApi extends CsvApiBase {
      *                               or run {@link #setHeaders(List)} after running {@link #save()} method.
      * @throws InvalidValueException in case header list is null or headers amount is different from row size.
      */
-    public void setHeaders(final List<String> headerList) throws CsvOperationException, InvalidValueException {
+    public void setHeaders(
+            final List<String> headerList) throws CsvOperationException, InvalidValueException {
+
         if (isSetHeaders) {
-            throw new CsvOperationException("Headers already set and cannot set more than one time");
+            throw new CsvOperationException("Headers already set and cannot set multiple times");
         }
 
         if (isCsvSaved()) {
@@ -102,7 +104,8 @@ public class CsvWriterApi extends CsvApiBase {
      */
     public void addRow(List<String> row) throws InvalidValueException, CsvOperationException {
         if (isCsvSaved()) {
-            throw new CsvOperationException("Row cannot be added because CSV file [" + filePath + "] already saved");
+            throw new CsvOperationException(
+                    "Row cannot be added because CSV file [" + filePath + "] already been saved");
         }
 
         validateNotNull(row);
@@ -123,7 +126,8 @@ public class CsvWriterApi extends CsvApiBase {
     public void addRow(List<String> row, int index)
             throws InvalidValueException, IndexOutOfBoundsException, CsvOperationException {
         if (isCsvSaved()) {
-            throw new CsvOperationException("Row cannot be added because CSV file [" + filePath + "] already saved");
+            throw new CsvOperationException(
+                    "Row cannot be added because CSV file [" + filePath + "] already been saved");
         }
 
         validateNotNull(row);
@@ -164,9 +168,12 @@ public class CsvWriterApi extends CsvApiBase {
      * @throws IndexOutOfBoundsException in case index is out of CSV rows bounds.
      * @throws CsvOperationException in case remove a row after CSV file already been saved.
      */
-    public void removeRow(int index) throws InvalidValueException, IndexOutOfBoundsException, CsvOperationException {
+    public void removeRow(
+            int index) throws InvalidValueException, IndexOutOfBoundsException, CsvOperationException {
+
         if (isCsvSaved()) {
-            throw new CsvOperationException("Row cannot be removed because CSV file [" + filePath + "] already saved");
+            throw new CsvOperationException(
+                    "Row cannot be removed because CSV file [" + filePath + "] already been saved");
         }
 
         validateNotNegative(index);
@@ -186,7 +193,7 @@ public class CsvWriterApi extends CsvApiBase {
      * The file can be saved only one time.
      * 
      * @throws IOException in case fail to save CSV file.
-     * @throws CsvOperationException in case CSV file already been saved. 
+     * @throws CsvOperationException in case CSV file already been saved.
      */
     public void save() throws IOException, CsvOperationException {
         if (isCsvSaved()) {
@@ -221,7 +228,7 @@ public class CsvWriterApi extends CsvApiBase {
             if (writer != null) {
                 writer.close();
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         } finally {
             writer = null;
             printWriter = null;
@@ -235,14 +242,14 @@ public class CsvWriterApi extends CsvApiBase {
     }
 
     private void writeCsvHeadersRowToFile() {
-        if (headerList.isEmpty() == false) {
+        if (!headerList.isEmpty()) {
             printWriter.println(convertCsvRowToFileRow(headerList));
         }
     }
 
     private void openFileAndSetPrintWriter() throws IOException {
         File file = new File(filePath);
-        writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+        writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
         printWriter = new PrintWriter(writer);
     }
 
@@ -260,7 +267,8 @@ public class CsvWriterApi extends CsvApiBase {
     private void updateRowSizeAfterUpdateHeaderList() throws InvalidValueException {
         if (rowSize != -1) {
             if (rowSize != headerList.size()) {
-                throw new InvalidValueException("Headers amount [" + headerList.size()
+                throw new InvalidValueException(
+                        "Headers amount [" + headerList.size()
                         + "] is different from CSV previous updated rows size [" + rowSize + "]");
             }
         } else {
@@ -269,10 +277,10 @@ public class CsvWriterApi extends CsvApiBase {
     }
 
     private String convertCsvRowToFileRow(List<String> csvRow) {
-        StringBuffer rowToFile = new StringBuffer();
+        StringBuilder rowToFile = new StringBuilder();
 
         for (String cell : csvRow) {
-            cell = updateCellIfContainInvertedCommans(cell);
+            cell = updateCellIfContainInvertedCommas(cell);
             cell = delimitWithInvertedCommasIfComplexCell(cell);
             rowToFile.append(cell).append(cellsSplitter);
         }
@@ -280,7 +288,7 @@ public class CsvWriterApi extends CsvApiBase {
         return StringUtil.removeLastChar(rowToFile.toString());
     }
 
-    private String updateCellIfContainInvertedCommans(String cell) {
+    private String updateCellIfContainInvertedCommas(String cell) {
         return cell.replace("\"", "\"\"");
     }
 
